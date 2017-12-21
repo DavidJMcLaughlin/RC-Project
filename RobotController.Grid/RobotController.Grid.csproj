@@ -44,9 +44,13 @@
     <Compile Include="CardinalDirection.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rotation.cs" />
     <Compile Include="Simple2DGrid.cs" />
     <Compile Include="Tile\BaseTile.cs" />
     <Compile Include="Tile\EmptyTile.cs" />
+    <Compile Include="Tile\HoleTile.cs" />
+    <Compile Include="Tile\RockTile.cs" />
+    <Compile Include="Tile\SpinnerTile.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
