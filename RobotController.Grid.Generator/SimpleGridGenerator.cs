@@ -64,7 +64,7 @@ namespace RobotController.Grid.Generator
         public virtual List<BaseTile> GenerateObstructions(Simple2DGrid grid)
         {
             List<BaseTile> obstructions = new List<BaseTile>();
-            List<Point> freeLocations = this.GetAllEmptyPoints(grid);
+            List<Point> freeLocations = Simple2DGrid.GetAllEmptyPoints(grid);
 
             for (int i = 0; i < this.MaxObstructions; i++)
             {
