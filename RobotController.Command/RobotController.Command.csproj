@@ -42,6 +42,8 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RobotCommand.cs" />
+    <Compile Include="RobotCommandEventArgs.cs" />
+    <Compile Include="RobotMoveCommand.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
