@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotController.Command.Pro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotController.Grid.Tests", "RobotController.Grid.Tests\RobotController.Grid.Tests.csproj", "{FF500ECE-52DC-4483-BF4D-3E8A924852E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotController.Grid.Generator.Tests", "RobotController.Grid.Generator.Tests\RobotController.Grid.Generator.Tests.csproj", "{4ADA9040-A021-46DC-A72C-3F2BAD025B06}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{FF500ECE-52DC-4483-BF4D-3E8A924852E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF500ECE-52DC-4483-BF4D-3E8A924852E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF500ECE-52DC-4483-BF4D-3E8A924852E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ADA9040-A021-46DC-A72C-3F2BAD025B06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ADA9040-A021-46DC-A72C-3F2BAD025B06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ADA9040-A021-46DC-A72C-3F2BAD025B06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ADA9040-A021-46DC-A72C-3F2BAD025B06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
