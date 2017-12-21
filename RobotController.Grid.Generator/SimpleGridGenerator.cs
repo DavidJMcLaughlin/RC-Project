@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 
 namespace RobotController.Grid.Generator
 {
+    /// <summary>
+    /// Generates Simple2DGrid objects
+    /// </summary>
     public class SimpleGridGenerator : IGridGenerator
     {
+        public SimpleGridGenerator(int width, int height) : this(new Size(width, height))
+        {
+        }
         public SimpleGridGenerator(Size gridSize)
         {
             this.GridSize = gridSize;
@@ -129,7 +135,7 @@ namespace RobotController.Grid.Generator
         }
 
         /// <summary>
-        /// Returns a recommended number of max obstruction tiles based on grid size.
+        /// Returns a recommended number of max obstruction tiles based on this.GridSize.
         /// </summary>
         public virtual int GetDefaultMaxObstructions()
         {
