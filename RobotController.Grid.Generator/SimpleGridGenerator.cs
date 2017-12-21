@@ -96,30 +96,6 @@ namespace RobotController.Grid.Generator
         }
 
         /// <summary>
-        /// Gets all empty points on a given grid.
-        /// </summary>
-        public virtual List<Point> GetAllEmptyPoints(Simple2DGrid grid)
-        {
-            List<Point> freeLocations = new List<Point>();
-
-            for (int x = 0; x < grid.Bounds.Width; x++)
-            {
-                for (int y = 0; y < grid.Bounds.Height; y++)
-                {
-                    Point location = new Point(x, y);
-                    BaseTile tile = grid.GetTileAtLocation(location);
-
-                    if (tile.Id == EmptyTile.TILE_ID)
-                    {
-                        freeLocations.Add(location);
-                    }
-                }
-            }
-
-            return freeLocations;
-        }
-
-        /// <summary>
         /// Returns a default HashSet of obstruction tiles.
         /// </summary>
         public virtual HashSet<BaseTile> GetDefaultAvailableObstructions()
