@@ -15,6 +15,10 @@ namespace RobotController.Grid.Tile
         public HoleTile(Point location) : base(location, HoleTile.TILE_ID)
         {
         }
+        public HoleTile(Point startLocation, Point connectedLocation) : base(startLocation, HoleTile.TILE_ID)
+        {
+            this.ConnectedLocation = connectedLocation;
+        }
         public HoleTile(int xStartLocation, int yStartLocation) : base(xStartLocation, yStartLocation, HoleTile.TILE_ID)
         {
         }
