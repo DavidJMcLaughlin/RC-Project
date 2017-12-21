@@ -26,5 +26,10 @@ namespace RobotController.Grid
 
         public int X { get { return this.Location.X; } }
         public int Y { get { return this.Location.Y; } }
+
+        public override string ToString()
+        {
+            return string.Format("{X={0}, Y={1}, D={2}}", this.X, this.Y, this.Direction);
+        }
     }
 }
