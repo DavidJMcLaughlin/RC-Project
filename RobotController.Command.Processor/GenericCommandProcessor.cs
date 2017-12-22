@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RobotController.Robot;
 
 namespace RobotController.Command.Processor
 {
@@ -11,6 +12,9 @@ namespace RobotController.Command.Processor
     /// </summary>
     public class GenericCommandProcessor
     {
+        public event EventHandler<RobotCommandEventArgs> CommandProcessedSuccessfully;
+        public event EventHandler<RobotCommandEventArgs> CommandProcessedUnsuccessfully;
+
         public Dictionary<int, ICommandInterpreter> CommandProcessorMap { get; private set; } = new Dictionary<int, ICommandInterpreter>();
 
         public virtual void ProcessCommand(RobotCommand command, IControllableRobot robot)
@@ -18,7 +22,16 @@ namespace RobotController.Command.Processor
             if (this.IsCommandValid(command))
             {
                 bool success = this.TryExecuteCommand(command, robot);
+
+                if (success)
+                {
+                    this?.CommandProcessedSuccessfully?.Invoke(this, new RobotCommandEventArgs(command));
+
+                    return;
+                }
             }
+
+            this?.CommandProcessedUnsuccessfully?.Invoke(this, new RobotCommandEventArgs(command));
         }
 
         /// <summary>
