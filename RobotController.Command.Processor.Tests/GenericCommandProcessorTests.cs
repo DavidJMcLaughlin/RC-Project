@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RobotController.Robot;
+using RobotController.Grid;
+using System.Drawing;
 
 namespace RobotController.Command.Processor.Tests
 {
@@ -17,14 +19,19 @@ namespace RobotController.Command.Processor.Tests
         [TestMethod()]
         public void ProcessCommand_Test()
         {
-            Assert.Fail(); // fail until we have an implementation of IControllableRobot
+            Simple2DGrid grid = new Simple2DGrid(0, 0, 32, 32);
+            Position starting = new Position(grid.Bounds.Width / 2, grid.Bounds.Height / 2, CardinalDirection.North);
 
             RobotMoveCommand command = new RobotMoveCommand("F");
-            IControllableRobot robot = null;
+            IControllableRobot robot = new SimpleRobot(grid, starting);
+
+            ICommandInterpreter ici = new MovementCommandInterpreter();
+
+            this.CommandProcessorToTest.CommandProcessorMap.Add(command.Id, ici);
 
             bool success = false;
 
-            this.CommandProcessorToTest.CommandProcessedSuccessfully += delegate(object sender, RobotCommandEventArgs e)
+            this.CommandProcessorToTest.CommandProcessedSuccessfully += delegate (object sender, RobotCommandEventArgs e)
             {
                 success = true;
             };
@@ -68,12 +75,12 @@ namespace RobotController.Command.Processor.Tests
         [TestMethod()]
         public void TryExecuteCommand_Test()
         {
-            Assert.Fail(); // fail until we have an implementation of IControllableRobot
-
+            Simple2DGrid grid = new Simple2DGrid(0, 0, 32, 32);
+            Position starting = new Position(grid.Bounds.Width / 2, grid.Bounds.Height / 2, CardinalDirection.North);
 
             RobotMoveCommand command = new RobotMoveCommand("F");
             ICommandInterpreter ici = new MovementCommandInterpreter();
-            IControllableRobot robot = null;
+            IControllableRobot robot = new SimpleRobot(grid, starting);
 
             this.CommandProcessorToTest.CommandProcessorMap.Add(command.Id, ici);
 
