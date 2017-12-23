@@ -78,7 +78,7 @@ namespace RobotController.Robot
         /// </summary>
         public virtual void Rotate(Rotation rotation)
         {
-            CardinalDirection newDirection = this.RotateCardinalDirectionFromRotation(this.CurrentPosition.Direction, rotation);
+            CardinalDirection newDirection = this.RotateCardinalDirection(this.CurrentPosition.Direction, rotation);
             this.SetPosition(new Position(this.CurrentPosition.Location, newDirection));
         }
 
@@ -149,7 +149,7 @@ namespace RobotController.Robot
         public virtual Position AdjustPositionForSpinner(BaseTile tile, Position currentPosition)
         {
             SpinnerTile sTile = (SpinnerTile)tile;
-            CardinalDirection newDirection = this.RotateCardinalDirectionFromRotation(currentPosition.Direction, sTile.SpinAmount);
+            CardinalDirection newDirection = this.RotateCardinalDirection(currentPosition.Direction, sTile.SpinAmount);
             return new Position(currentPosition.Location, newDirection);
         }
 
@@ -158,13 +158,13 @@ namespace RobotController.Robot
         /// </summary>
         public virtual bool IsPositionValid(Position position)
         {
-            return Grid.Contains(position);
+            return this.Grid.Contains(position);
         }
 
         /// <summary>
         /// Apply a rotation value to a CardinalDirection.
         /// </summary>
-        public CardinalDirection RotateCardinalDirectionFromRotation(CardinalDirection currentDirection, Rotation rotateDirection)
+        public CardinalDirection RotateCardinalDirection(CardinalDirection currentDirection, Rotation rotateDirection)
         {
             int current = (int)currentDirection;
             int next = (int)rotateDirection;
