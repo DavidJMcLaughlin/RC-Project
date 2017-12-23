@@ -118,13 +118,34 @@ namespace RobotController.Robot.Tests
         [TestMethod()]
         public void AdjustPositionForHole_Test()
         {
-            Assert.Fail();
+            SimpleRobot robot = this.InitSimpleRobotInstance();
+
+            Point holeStart = new Point(robot.CurrentPosition.X + 4, robot.CurrentPosition.Y + 4);
+            Point holeEnd = new Point(holeStart.X + 4, holeStart.Y + 4);
+
+            HoleTile tile = new HoleTile(holeStart, holeEnd);
+
+            Position newPosition = robot.GetAdvancedPosition();
+            Position adjustedPosition = robot.AdjustPositionForHole(tile, newPosition);
+
+            bool success = (adjustedPosition.Location == holeEnd) && (newPosition.Direction == adjustedPosition.Direction);
+
+            Assert.IsTrue(success);
         }
 
         [TestMethod()]
         public void AdjustPositionForSpinner_Test()
         {
-            Assert.Fail();
+            SimpleRobot robot = this.InitSimpleRobotInstance();
+
+            SpinnerTile tile = new SpinnerTile(1, 1, Rotation.CW90);
+
+            Position newPosition = robot.GetAdvancedPosition();
+            Position adjustedPosition = robot.AdjustPositionForSpinner(tile, newPosition);
+
+            bool success = (adjustedPosition.Direction == CardinalDirection.East);
+
+            Assert.IsTrue(success);
         }
 
         [TestMethod()]
