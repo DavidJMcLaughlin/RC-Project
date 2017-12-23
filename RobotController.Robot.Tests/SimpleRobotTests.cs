@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RobotController.Grid;
+using RobotController.Grid.Tile;
 using RobotController.Command;
 using System.Drawing;
 
@@ -84,21 +85,34 @@ namespace RobotController.Robot.Tests
         }
 
         [TestMethod()]
-        public void TryToAdjustPositionIntoTile_Test()
+        public void AdjustPositionForEmptyTest()
         {
-            Assert.Fail();
-        }
+            SimpleRobot robot = this.InitSimpleRobotInstance();
 
-        [TestMethod()]
-        public void AdjustPositionForEmpty_Test()
-        {
-            Assert.Fail();
+            EmptyTile tile = new EmptyTile(robot.GetPosition().Location);
+
+            Position newPosition = robot.GetAdvancedPosition();
+            Position adjustedPosition = robot.AdjustPositionForEmpty(tile, newPosition);
+
+            bool success = (newPosition.Location == adjustedPosition.Location) && (newPosition.Direction == adjustedPosition.Direction);
+
+            Assert.IsTrue(success);
         }
 
         [TestMethod()]
         public void AdjustPositionForRock_Test()
         {
-            Assert.Fail();
+            SimpleRobot robot = this.InitSimpleRobotInstance();
+
+            RockTile tile = new RockTile(robot.GetPosition().Location);
+
+            Position oldPosition = robot.GetPosition();
+            Position newPosition = robot.GetAdvancedPosition();
+            Position adjustedPosition = robot.AdjustPositionForRock(tile, newPosition);
+
+            bool success = (adjustedPosition.Location == oldPosition.Location) && (adjustedPosition.Direction == oldPosition.Direction);
+
+            Assert.IsTrue(success);
         }
 
         [TestMethod()]
