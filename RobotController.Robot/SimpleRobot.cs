@@ -133,11 +133,7 @@ namespace RobotController.Robot
 
         public virtual Position AdjustPositionForRock(BaseTile tile, Position currentPosition)
         {
-            this.Rotate(Rotation.CW180);
-            Position newPosition = this.GetAdvancedPosition(); // Set the position back to where it came from (outside of the rock)
-            this.Rotate(Rotation.CW180); // Set the direction back to how it was originally
-
-            return newPosition;
+            return this.CurrentPosition;
         }
 
         public virtual Position AdjustPositionForHole(BaseTile tile, Position currentPosition)
