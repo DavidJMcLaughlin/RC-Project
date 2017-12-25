@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using RobotController.CLI.Graphics;
 using RobotController.Command;
 using RobotController.Command.Processor;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,11 +31,8 @@ namespace RobotController.CLI
             Program.ProcessCommandLineArgs(args);
             Program.InitializeRenderers();
 
-            if (Program.OperationMode != ModeOfOperation.CommandLineMode)
-            {
-                Program.SetupInteractiveMode();
-            }
-            else if (!string.IsNullOrEmpty(Program.GridPath))
+
+            if (!string.IsNullOrEmpty(Program.GridPath))
             {
                 if (Program.Serialize)
                 {
@@ -42,15 +41,25 @@ namespace RobotController.CLI
 
                     Console.WriteLine("Grid saved to '{0}'", Program.GridPath);
                 }
-                else if (!string.IsNullOrEmpty(Program.CommandText))
+                else
                 {
-                    Program.positionRenderer.LimitOutputToAvailableHeight = false;
                     Program.LoadGridFromFile(Program.GridPath);
-                    Program.SetupController();
-                    Program.RunMoveCommandOnController(Program.CommandText);
 
-                    Program.OutputRenderer.PreviousPositionRenderer.Draw();
+                    if (!string.IsNullOrEmpty(Program.CommandText))
+                    {
+                        Program.SetupController();
+                        Program.RunMoveCommandOnController(Program.CommandText);
+
+                        Program.positionRenderer.LimitOutputToAvailableHeight = false;
+
+                        Program.OutputRenderer.PreviousPositionRenderer.Draw();
+                    }
                 }
+            }
+
+            if (Program.OperationMode != ModeOfOperation.CommandLineMode)
+            {
+                Program.SetupInteractiveMode();
             }
 
             Console.WriteLine("Press any key to exit...");
@@ -64,6 +73,8 @@ namespace RobotController.CLI
 
         private static string GridPath = string.Empty;
         private static string CommandText = string.Empty;
+
+        private static Point RobotStartPosition = Point.Empty;
 
         private static bool Serialize = false;
 
@@ -117,10 +128,15 @@ namespace RobotController.CLI
 
         private static void SetupController()
         {
-            List<Point> emptyPoints = Simple2DGrid.GetAllEmptyPoints(Program.Grid);
-            Point randomStartingPoint = emptyPoints[randGen.Next(0, emptyPoints.Count)];
+            Position startingPosition = new Position(Program.RobotStartPosition, CardinalDirection.North);
 
-            Position startingPosition = new Position(randomStartingPoint, CardinalDirection.North);
+            if (Program.RobotStartPosition == Point.Empty)
+            {
+                List<Point> emptyPoints = Simple2DGrid.GetAllEmptyPoints(Program.Grid);
+                Point randomStartingPoint = emptyPoints[randGen.Next(0, emptyPoints.Count)];
+
+                startingPosition = new Position(randomStartingPoint, CardinalDirection.North);
+            }
 
             Program.RobotInstance = new SimpleRobot(Program.Grid, startingPosition);
             Program.RobotInstance.TileEncountered += RobotInstance_TileEncountered;
@@ -136,7 +152,11 @@ namespace RobotController.CLI
 
         private static void SetupInteractiveMode()
         {
-            Program.GenerateGrid();
+            if (Program.Grid == null)
+            {
+                Program.GenerateGrid();
+            }
+
             Program.SetupController();
 
             Console.WriteLine("Robot: {0}", Program.RobotInstance.StartingPosition);
@@ -152,11 +172,11 @@ namespace RobotController.CLI
                 {
                     case "-grid":
                         Program.GridPath = Program.GetNextArgOrDefault(i, args);
-                        Program.OperationMode = ModeOfOperation.CommandLineMode;
                         break;
 
                     case "-command":
                         Program.CommandText = Program.GetNextArgOrDefault(i, args).ToUpper();
+                        Program.OperationMode = ModeOfOperation.CommandLineMode;
                         break;
 
                     case "-serialize":
@@ -166,8 +186,25 @@ namespace RobotController.CLI
                     case "-multimode":
                         Program.OperationMode = ModeOfOperation.InteractiveMultipleCommand;
                         break;
+
+                    case "-startpos":
+                        string x = Program.GetNextArgOrDefault(i, args);
+                        string y = Program.GetNextArgOrDefault(i + 1, args);
+                        Program.SetRobotStartPositionFromCommandLine(x, y);
+                        break;
                 }
             }
+        }
+
+        private static void SetRobotStartPositionFromCommandLine(string x, string y)
+        {
+            int xCoordinate = 0;
+            int yCoordinate = 0;
+
+            int.TryParse(x, out xCoordinate);
+            int.TryParse(y, out yCoordinate);
+
+            Program.RobotStartPosition = new Point(xCoordinate, yCoordinate);
         }
 
         private static string GetNextArgOrDefault(int index, string[] args)
@@ -185,10 +222,15 @@ namespace RobotController.CLI
             if (File.Exists(path))
             {
                 string fileText = File.ReadAllText(path);
+
+                DefaultContractResolver contractResolver = new DefaultContractResolver();
+                contractResolver.DefaultMembersSearchFlags |= BindingFlags.NonPublic;
+
                 Simple2DGrid grid = JsonConvert.DeserializeObject<Simple2DGrid>(fileText, new JsonSerializerSettings()
                 {
                     ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
-                    TypeNameHandling = TypeNameHandling.All
+                    TypeNameHandling = TypeNameHandling.All,
+                    ContractResolver = contractResolver
                 });
 
                 Program.Grid = grid;
@@ -305,16 +347,15 @@ namespace RobotController.CLI
 
         private static void RobotInstance_PositionChanged(object sender, EventArgs e)
         {
-            Position robotPosition = Program.RobotInstance.CurrentPosition;
-            BaseTile tile = Program.Grid.GetTileAtLocation(robotPosition.Location);
-
-            Program.RobotStatus.PreviousPositions.Add(new RobotMovementData(robotPosition, tile));
             Program.RobotStatus.WasLastMoveSuccessful = true;
         }
 
         private static void RobotInstance_TileEncountered(object sender, TileEventArgs e)
         {
+            Position robotPosition = Program.RobotInstance.CurrentPosition;
+
             Program.RobotStatus.LastTileEncountered = e;
+            Program.RobotStatus.PreviousPositions.Add(new RobotMovementData(robotPosition, e.Tile));
         }
 
         private static void RobotInstance_UnableToChangePosition(object sender, TileEventArgs e)
