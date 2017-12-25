@@ -1,4 +1,5 @@
-﻿using RobotController.Command;
+﻿using Newtonsoft.Json;
+using RobotController.Command;
 using RobotController.Command.Processor;
 using RobotController.Grid;
 using RobotController.Grid.Generator;
@@ -8,28 +9,57 @@ using RobotController.Robot;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace RobotController.CLI
 {
+    /// <summary>
+    /// A very quick and dirty console app for demonstration purposes.
+    /// </summary>
     public class Program
     {
         static void Main(string[] args)
         {
             Console.Title = "Robot controller - David McLaughlin";
 
-            Program.GenerateGrid();
-            Program.SetupController();
+            Program.ProcessCommandLineArgs(args);
 
-            Console.WriteLine("Robot: {0}", Program.RobotInstance.StartingPosition);
+            if (Program.OperationMode != ModeOfOperation.CommandLineMode)
+            {
+                Program.SetupInteractiveMode();
+            }
+            else if (!string.IsNullOrEmpty(Program.GridPath))
+            {
+                if (Program.Serialize)
+                {
+                    Program.GenerateGrid();
+                    Program.SaveGridToFile(Program.GridPath);
 
-            Program.WaitForInput();
+                    Console.WriteLine("Grid saved to '{0}'", Program.GridPath);
+                }
+                else if (!string.IsNullOrEmpty(Program.CommandText))
+                {
+                    Program.LoadGridFromFile(Program.GridPath);
+                    Program.RunMoveCommandOnController(Program.CommandText);
+                }
+            }
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey(true);
         }
+
+        private const int GRID_WIDTH = 128;
+        private const int GRID_HEIGHT = 128;
+
+        private static ModeOfOperation OperationMode = ModeOfOperation.InteractiveSingleCommand;
+
+        private static string GridPath = string.Empty;
+        private static string CommandText = string.Empty;
+
+        private static bool Serialize = false;
 
         private static Random randGen = new Random();
         private static SimpleGridGenerator gGenerator;
@@ -41,9 +71,9 @@ namespace RobotController.CLI
         public static RobotOperatorStatus OperatorStatus = new RobotOperatorStatus();
         public static RobotStatus RobotStatus = new RobotStatus();
 
-        public static void GenerateGrid()
+        private static void GenerateGrid()
         {
-            Program.gGenerator = new SimpleGridGenerator(new Size(128, 128));
+            Program.gGenerator = new SimpleGridGenerator(new Size(Program.GRID_WIDTH, Program.GRID_HEIGHT));
             Program.gGenerator.AvailableObstrctions.Add(new HoleTile(Point.Empty));
             Program.gGenerator.AvailableObstrctions.Add(new RockTile(Point.Empty));
             Program.gGenerator.AvailableObstrctions.Add(new SpinnerTile(Point.Empty));
@@ -56,7 +86,7 @@ namespace RobotController.CLI
             Console.WriteLine();
         }
 
-        public static void SetupController()
+        private static void SetupController()
         {
             List<Point> emptyPoints = Simple2DGrid.GetAllEmptyPoints(Program.Grid);
             Point randomStartingPoint = emptyPoints[randGen.Next(0, emptyPoints.Count)];
@@ -75,19 +105,85 @@ namespace RobotController.CLI
             Program.RobotController.AcknowledgeCommandReceived += RobotController_AcknowledgeCommandReceived;
         }
 
+        private static void SetupInteractiveMode()
+        {
+            Program.GenerateGrid();
+            Program.SetupController();
+
+            Console.WriteLine("Robot: {0}", Program.RobotInstance.StartingPosition);
+
+            Program.WaitForInput();
+        }
+
+        private static void ProcessCommandLineArgs(string[] args)
+        {
+            for (int i = 0; i < args.Length; i++)
+            {
+                switch (args[i].ToLowerInvariant())
+                {
+                    case "-grid":
+                        Program.GridPath = Program.GetNextArgOrDefault(i, args);
+                        Program.OperationMode = ModeOfOperation.CommandLineMode;
+                        break;
+
+                    case "-command":
+                        Program.CommandText = Program.GetNextArgOrDefault(i, args);
+                        break;
+
+                    case "-serialize":
+                        Program.Serialize = true;
+                        break;
+                }
+            }
+        }
+
+        private static string GetNextArgOrDefault(int index, string[] args)
+        {
+            if ((index + 1) < args.Length)
+            {
+                return args[index + 1];
+            }
+
+            return string.Empty;
+        }
+
+        private static void LoadGridFromFile(string path)
+        {
+            if (File.Exists(path))
+            {
+                string fileText = File.ReadAllText(path);
+                Simple2DGrid grid = JsonConvert.DeserializeObject<Simple2DGrid>(fileText);
+
+                Program.Grid = grid;
+            }
+        }
+
+        private static void SaveGridToFile(string path)
+        {
+            string text = JsonConvert.SerializeObject(Program.Grid);
+            File.WriteAllText(path, text);
+        }
+
         private static void WaitForInput()
         {
             ConsoleKeyInfo keyInfo;
 
             do
             {
-                Console.WriteLine("Press a key to move: ");
-
                 keyInfo = Console.ReadKey(true);
 
                 Program.SetStateFromKey(keyInfo);
 
-                Program.ProcessSingleCommand(keyInfo);
+                switch (Program.OperationMode)
+                {
+                    case ModeOfOperation.InteractiveSingleCommand:
+                        Program.ProcessSingleCommand(keyInfo);
+                        break;
+
+                    case ModeOfOperation.InteractiveMultipleCommand:
+                        Program.ProcessMultipleCommands();
+                        break;
+                }
 
                 Program.DrawProgramOutput();
             }
@@ -101,25 +197,42 @@ namespace RobotController.CLI
                 case ConsoleKey.D1:
                     Program.RegenerateObstructions();
                     break;
+
+                case ConsoleKey.LeftArrow:
+                    if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+                    {
+                        Program.RobotInstance.Rotate(Rotation.CCW90);
+                    }
+                    break;
+                case ConsoleKey.RightArrow:
+                    if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+                    {
+                        Program.RobotInstance.Rotate(Rotation.CW90);
+                    }
+                    break;
             }
         }
 
         private static void ProcessSingleCommand(ConsoleKeyInfo keyInfo)
         {
-            string commandText = char.ToUpper(keyInfo.KeyChar).ToString();
-            RobotCommand command = new RobotMoveCommand(commandText);
+            Console.WriteLine("Press a key to move: ");
 
-            Program.RobotController.QueueCommand(command);
-            Program.RobotController.RunNextCommand();
+            string commandText = char.ToUpper(keyInfo.KeyChar).ToString();
+            Program.RunMoveCommandOnController(commandText);
         }
 
         private static void ProcessMultipleCommands()
         {
-            Console.WriteLine("Please type your commands here: ");
+            Console.Write("Please type your commands here: ");
 
             string commandText = Console.ReadLine().ToUpper();
 
-            RobotCommand command = new RobotMoveCommand(commandText);
+            Program.RunMoveCommandOnController(commandText);
+        }
+
+        private static void RunMoveCommandOnController(string data)
+        {
+            RobotCommand command = new RobotMoveCommand(data);
 
             Program.RobotController.QueueCommand(command);
             Program.RobotController.RunNextCommand();
