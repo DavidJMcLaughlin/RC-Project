@@ -43,7 +43,10 @@ namespace RobotController.CLI
                 else if (!string.IsNullOrEmpty(Program.CommandText))
                 {
                     Program.LoadGridFromFile(Program.GridPath);
+                    Program.SetupController();
                     Program.RunMoveCommandOnController(Program.CommandText);
+
+                    Program.DrawRobotPreviousPositions();
                 }
             }
 
@@ -127,7 +130,7 @@ namespace RobotController.CLI
                         break;
 
                     case "-command":
-                        Program.CommandText = Program.GetNextArgOrDefault(i, args);
+                        Program.CommandText = Program.GetNextArgOrDefault(i, args).ToUpper();
                         break;
 
                     case "-serialize":
@@ -333,7 +336,7 @@ namespace RobotController.CLI
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 HoleTile ht = (HoleTile)Program.RobotStatus.LastTileEncountered.Tile;
-                Console.Write("Hole to {0}", ht.ConnectedLocation);
+                Console.Write("Hole to {0}", (Program.RobotInstance.CurrentPosition.Location == ht.ConnectedLocation ? ht.ConnectedLocation : ht.StartLocation));
             }
 
             Console.ForegroundColor = startingColor;
