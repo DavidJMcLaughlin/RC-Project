@@ -25,10 +25,10 @@ namespace RobotController.CLI
 
             ConsoleKeyInfo keyInfo;
 
+            Console.WriteLine("Robot: {0}", Program.RobotInstance.StartingPosition);
+
             do
             {
-                Console.WriteLine("X={0}, Y={1}, D={2}", Program.RobotInstance.CurrentPosition.X, Program.RobotInstance.CurrentPosition.Y, Program.RobotInstance.CurrentPosition.Direction);
-
                 keyInfo = Console.ReadKey(true);
 
                 Program.RobotController.QueueCommand(new RobotMoveCommand(char.ToUpper(keyInfo.KeyChar).ToString()));
@@ -51,6 +51,11 @@ namespace RobotController.CLI
             Program.gGenerator.AvailableObstrctions.Add(new SpinnerTile(Point.Empty));
 
             Program.Grid = gGenerator.Generate();
+
+            Console.WriteLine("New grid created: ");
+            Console.WriteLine("  Bounds: {0}", Program.Grid.Bounds);
+            Console.WriteLine("  Obstructions: {0}", Program.Grid.Obstructions.Count);
+            Console.WriteLine();
         }
 
         public static void SetupController()
@@ -61,9 +66,37 @@ namespace RobotController.CLI
             Position startingPosition = new Position(randomStartingPoint, CardinalDirection.North);
 
             Program.RobotInstance = new SimpleRobot(Program.Grid, startingPosition);
+            Program.RobotInstance.TileEncountered += RobotInstance_TileEncountered;
 
             Program.RobotController = new RobotOperator(Program.RobotInstance);
             Program.RobotController.RegisterCommandInterpreter(RobotMoveCommand.COMMAND_ID, new MovementCommandInterpreter());
+        }
+
+        private static void RobotInstance_TileEncountered(object sender, TileEventArgs e)
+        {
+            Type tileType = e.Tile.GetType();
+
+            if (tileType == typeof(RockTile))
+            {
+                Console.WriteLine("Unable to move to position because of a rock");
+            }
+            else if (tileType == typeof(SpinnerTile))
+            {
+                SpinnerTile st = (SpinnerTile)e.Tile;
+                Console.WriteLine("Encountered a spinner set to [{0}]", st.SpinAmount);
+            }
+            else if (tileType == typeof(HoleTile))
+            {
+                HoleTile ht = (HoleTile)e.Tile;
+                Console.WriteLine("Encountered a hole connected to [{0}]", ht.ConnectedLocation);
+            }
+
+            string tileName = e.Tile.GetType().Name;
+            int xLocation = Program.RobotInstance.CurrentPosition.X;
+            int yLocation = Program.RobotInstance.CurrentPosition.Y;
+            CardinalDirection direction = Program.RobotInstance.CurrentPosition.Direction;
+
+            Console.WriteLine("{0} at (X={1}, Y={2}, D={3})", tileName, xLocation, yLocation, direction);
         }
     }
 }
