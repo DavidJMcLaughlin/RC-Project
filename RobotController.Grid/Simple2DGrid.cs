@@ -13,6 +13,9 @@ namespace RobotController.Grid
     /// </summary>
     public class Simple2DGrid
     {
+        public Simple2DGrid() : this(new Rectangle(0, 0, 16, 16))
+        {
+        }
         public Simple2DGrid(int startingX, int startingY, int width, int height) : this(new Rectangle(startingX, startingY, width, height))
         {
         }
