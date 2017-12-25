@@ -46,11 +46,6 @@ namespace RobotController.Grid.Generator
         {
             Simple2DGrid grid = this.GetGrid();
 
-            if (this.MaxObstructions < 0)
-            {
-                this.MaxObstructions = this.GetDefaultMaxObstructions();
-            }
-
             List<BaseTile> obstructions = this.GenerateObstructions(grid);
             grid.Obstructions.Clear();
             grid.Obstructions.AddRange(obstructions);
@@ -63,6 +58,11 @@ namespace RobotController.Grid.Generator
         /// </summary>
         public virtual List<BaseTile> GenerateObstructions(Simple2DGrid grid)
         {
+            if (this.MaxObstructions < 0)
+            {
+                this.MaxObstructions = this.GetDefaultMaxObstructions();
+            }
+
             List<BaseTile> obstructions = new List<BaseTile>();
             List<Point> freeLocations = Simple2DGrid.GetAllEmptyPoints(grid);
 
