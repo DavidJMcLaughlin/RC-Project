@@ -25,7 +25,8 @@ namespace RobotController.Robot
         /// <summary>
         /// This event is triggered when the robot's location or rotation is changed.
         /// </summary>
-        public event EventHandler PositionChanged;
+        public event EventHandler<TileEventArgs> PositionChanged;
+        public event EventHandler<TileEventArgs> UnableToChangePosition;
         public event EventHandler<TileEventArgs> TileEncountered;
 
         public Simple2DGrid Grid { get; private set; }
@@ -70,7 +71,11 @@ namespace RobotController.Robot
                 this.PreviousPosition = this.CurrentPosition;
                 this.CurrentPosition = adjustedPosition;
 
-                this?.PositionChanged?.Invoke(this, EventArgs.Empty);
+                this?.PositionChanged?.Invoke(this, new TileEventArgs(tile));
+            }
+            else
+            {
+                this?.UnableToChangePosition?.Invoke(this, new TileEventArgs(tile));
             }
         }
 
