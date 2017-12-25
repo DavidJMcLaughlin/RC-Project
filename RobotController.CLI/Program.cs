@@ -18,7 +18,7 @@ namespace RobotController.CLI
     {
         static void Main(string[] args)
         {
-            Console.Title = "Robot controller";
+            Console.Title = "Robot controller - David McLaughlin";
 
             Program.GenerateGrid();
             Program.SetupController();
@@ -81,6 +81,8 @@ namespace RobotController.CLI
 
             do
             {
+                Console.WriteLine("Press a key to move: ");
+
                 keyInfo = Console.ReadKey(true);
 
                 Program.SetStateFromKey(keyInfo);
@@ -168,7 +170,12 @@ namespace RobotController.CLI
 
             Console.Write("Robot: ");
             Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
-            Console.Write(spacer + "Last move successful: {0}", Program.RobotStatus.WasLastMoveSuccessful);
+
+            Console.Write(spacer + "Last move successful: ");
+            Console.ForegroundColor = (Program.RobotStatus.WasLastMoveSuccessful ? ConsoleColor.Green : ConsoleColor.Red);
+            Console.Write("{0}", Program.RobotStatus.WasLastMoveSuccessful);
+            Console.ForegroundColor = startingColor;
+
             Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
             Console.Write(spacer + "Position: {0}", Program.RobotInstance.CurrentPosition);
             Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
@@ -233,7 +240,7 @@ namespace RobotController.CLI
             int startingLeftIndex = Console.CursorLeft;
             int startingTopIndex = Console.CursorTop;
 
-            int viewSize = 5;
+            int viewSize = 7;
 
             List<BaseTile> tiles = new List<BaseTile>();
 
@@ -283,7 +290,7 @@ namespace RobotController.CLI
                     {
                         Console.Write("H");
                     }
-                    else
+                    else if (Program.Grid.Bounds.Contains(current))
                     {
                         Console.Write("░");
                     }
