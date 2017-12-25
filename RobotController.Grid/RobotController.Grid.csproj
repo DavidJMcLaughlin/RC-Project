@@ -51,6 +51,7 @@
     <Compile Include="Tile\HoleTile.cs" />
     <Compile Include="Tile\RockTile.cs" />
     <Compile Include="Tile\SpinnerTile.cs" />
+    <Compile Include="Tile\TileEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
