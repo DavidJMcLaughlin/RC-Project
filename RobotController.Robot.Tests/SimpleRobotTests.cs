@@ -31,7 +31,7 @@ namespace RobotController.Robot.Tests
             bool success = false;
 
             SimpleRobot robot = this.InitSimpleRobotInstance();
-            robot.PositionChanged += delegate (object sender, EventArgs e)
+            robot.PositionChanged += delegate (object sender, TileEventArgs e)
             {
                 success = true;
             };
@@ -47,7 +47,7 @@ namespace RobotController.Robot.Tests
             bool moved = false;
 
             SimpleRobot robot = this.InitSimpleRobotInstance();
-            robot.PositionChanged += delegate (object sender, EventArgs e)
+            robot.PositionChanged += delegate (object sender, TileEventArgs e)
             {
                 moved = true;
             };
