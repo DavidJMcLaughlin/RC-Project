@@ -46,9 +46,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\ControllerStatusRenderer.cs" />
+    <Compile Include="Graphics\GridStatusRenderer.cs" />
+    <Compile Include="Graphics\GridVisualizationRenderer.cs" />
+    <Compile Include="Graphics\IConsoleRenderer.cs" />
+    <Compile Include="Graphics\PreviousPositionRenderer.cs" />
+    <Compile Include="Graphics\ProgramOutputRenderer.cs" />
+    <Compile Include="Graphics\BaseConsoleRenderer.cs" />
+    <Compile Include="Graphics\RobotStatusRenderer.cs" />
     <Compile Include="ModeOfOperation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RobotMovementData.cs" />
     <Compile Include="RobotOperatorStatus.cs" />
     <Compile Include="RobotStatus.cs" />
   </ItemGroup>

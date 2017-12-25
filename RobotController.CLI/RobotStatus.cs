@@ -14,6 +14,6 @@ namespace RobotController.CLI
         public bool WasLastMoveSuccessful { get; set; }
         public TileEventArgs LastTileEncountered { get; set; } = new TileEventArgs(new EmptyTile(Point.Empty));
 
-        public List<Position> PreviousPositions { get; private set; } = new List<Position>();
+        public List<RobotMovementData> PreviousPositions { get; private set; } = new List<RobotMovementData>();
     }
 }
