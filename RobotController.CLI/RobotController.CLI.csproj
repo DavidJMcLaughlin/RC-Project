@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RobotOperatorStatus.cs" />
+    <Compile Include="RobotStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -23,18 +23,9 @@ namespace RobotController.CLI
             Program.GenerateGrid();
             Program.SetupController();
 
-            ConsoleKeyInfo keyInfo;
-
             Console.WriteLine("Robot: {0}", Program.RobotInstance.StartingPosition);
 
-            do
-            {
-                keyInfo = Console.ReadKey(true);
-
-                Program.RobotController.QueueCommand(new RobotMoveCommand(char.ToUpper(keyInfo.KeyChar).ToString()));
-                Program.RobotController.RunNextCommand();
-            }
-            while (keyInfo.Key != ConsoleKey.Escape);
+            Program.WaitForInput();
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey(true);
@@ -42,9 +33,13 @@ namespace RobotController.CLI
 
         private static Random randGen = new Random();
         private static SimpleGridGenerator gGenerator;
+
         public static Simple2DGrid Grid;
         public static RobotOperator RobotController;
         public static SimpleRobot RobotInstance;
+
+        public static RobotOperatorStatus OperatorStatus = new RobotOperatorStatus();
+        public static RobotStatus RobotStatus = new RobotStatus();
 
         public static void GenerateGrid()
         {
@@ -71,11 +66,234 @@ namespace RobotController.CLI
             Program.RobotInstance = new SimpleRobot(Program.Grid, startingPosition);
             Program.RobotInstance.TileEncountered += RobotInstance_TileEncountered;
             Program.RobotInstance.PositionChanged += RobotInstance_PositionChanged;
+            Program.RobotInstance.UnableToChangePosition += RobotInstance_UnableToChangePosition;
 
             Program.RobotController = new RobotOperator(Program.RobotInstance);
             Program.RobotController.RegisterCommandInterpreter(RobotMoveCommand.COMMAND_ID, new MovementCommandInterpreter());
             Program.RobotController.CommandProcessedSuccessfully += RobotController_CommandProcessedSuccessfully;
             Program.RobotController.CommandProcessedUnsuccessfully += RobotController_CommandProcessedUnsuccessfully;
+            Program.RobotController.AcknowledgeCommandReceived += RobotController_AcknowledgeCommandReceived;
+        }
+
+        private static void WaitForInput()
+        {
+            ConsoleKeyInfo keyInfo;
+
+            do
+            {
+                keyInfo = Console.ReadKey(true);
+
+                Program.SetStateFromKey(keyInfo);
+
+                Program.ProcessSingleCommand(keyInfo);
+
+                Program.DrawProgramOutput();
+            }
+            while (keyInfo.Key != ConsoleKey.Escape);
+        }
+
+        private static void SetStateFromKey(ConsoleKeyInfo keyInfo)
+        {
+
+        }
+
+        private static void ProcessSingleCommand(ConsoleKeyInfo keyInfo)
+        {
+            string commandText = char.ToUpper(keyInfo.KeyChar).ToString();
+            RobotCommand command = new RobotMoveCommand(commandText);
+
+            Program.RobotController.QueueCommand(command);
+            Program.RobotController.RunNextCommand();
+        }
+
+        private static void ProcessMultipleCommands()
+        {
+            Console.WriteLine("Please type your commands here: ");
+
+            string commandText = Console.ReadLine().ToUpper();
+
+            RobotCommand command = new RobotMoveCommand(commandText);
+
+            Program.RobotController.QueueCommand(command);
+            Program.RobotController.RunNextCommand();
+        }
+
+        private static void DrawProgramOutput()
+        {
+            int screenDivision = (Console.WindowWidth / 3);
+
+            Console.Clear();
+
+            Console.SetCursorPosition(0, 0);
+            Program.DrawRobotStatus();
+
+            Console.SetCursorPosition(screenDivision, 0);
+            Program.DrawControllerStatus();
+
+            Console.SetCursorPosition((screenDivision * 2), 0);
+            Program.DrawGridStatus();
+
+            Console.SetCursorPosition(0, (Console.WindowHeight / 2));
+            Program.DrawRobotPreviousPositions();
+
+            Console.SetCursorPosition((Console.WindowWidth / 2) - 2, (Console.WindowHeight / 2));
+            Program.DrawSurroundings();
+
+            Console.SetCursorPosition(screenDivision * 2, (Console.WindowHeight / 2));
+        }
+
+        private static void DrawControllerStatus()
+        {
+            int startingLeftIndex = Console.CursorLeft;
+
+            string spacer = "  ";
+
+            Console.Write("Controller: ");
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + "Last command recieved:");
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + spacer + "Id: {0}", Program.OperatorStatus.LastCommandReceived.Command.Id);
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + spacer + "Data: {0}", Program.OperatorStatus.LastCommandReceived.Command.Data);
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + spacer + "Timestamp: {0}", Program.OperatorStatus.LastCommandReceived.Timestamp.ToLongTimeString()); 
+        }
+
+        private static void DrawRobotStatus()
+        {
+            ConsoleColor startingColor = Console.ForegroundColor;
+            int startingLeftIndex = Console.CursorLeft;
+
+            string spacer = "  ";
+
+            Console.Write("Robot: ");
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + "Last move successful: {0}", Program.RobotStatus.WasLastMoveSuccessful);
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + "Position: {0}", Program.RobotInstance.CurrentPosition);
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + "Last obstruction: ");
+
+            Type tileType = Program.RobotStatus.LastTileEncountered.Tile.GetType();
+
+            if (tileType == typeof(RockTile))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Rock");
+            }
+            else if (tileType == typeof(SpinnerTile))
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                SpinnerTile st = (SpinnerTile)Program.RobotStatus.LastTileEncountered.Tile;
+                Console.Write("Spinner [{0}]", st.SpinAmount);
+            }
+            else if (tileType == typeof(HoleTile))
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                HoleTile ht = (HoleTile)Program.RobotStatus.LastTileEncountered.Tile;
+                Console.Write("Hole to {0}", ht.ConnectedLocation);
+            }
+
+            Console.ForegroundColor = startingColor;
+        }
+
+        private static void DrawGridStatus()
+        {
+            int startingLeftIndex = Console.CursorLeft;
+
+            string spacer = "  ";
+
+            Console.Write("Grid: ");
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + "Size: {0}x{1}", Program.Grid.Bounds.Width, Program.Grid.Bounds.Height);
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + "Total tiles: {0}", (Program.Grid.Bounds.Width * Program.Grid.Bounds.Height));
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + "Total obstructions: {0}", Program.Grid.Obstructions.Count);
+        }
+
+        private static void DrawRobotPreviousPositions()
+        {
+            int startingLeftIndex = Console.CursorLeft;
+            int maxItemsToDraw = (Console.WindowHeight - Console.CursorTop) - 2;
+            maxItemsToDraw = ((maxItemsToDraw < Program.RobotStatus.PreviousPositions.Count) ? maxItemsToDraw : Program.RobotStatus.PreviousPositions.Count);
+
+            Console.Write("Previous {0} moves:", maxItemsToDraw);
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+
+            for (int i = (Program.RobotStatus.PreviousPositions.Count -  maxItemsToDraw); i < Program.RobotStatus.PreviousPositions.Count; i++)
+            {
+                Console.Write("Robot: {0}", Program.RobotStatus.PreviousPositions[i]);
+                Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            }
+        }
+
+        private static void DrawSurroundings()
+        {
+            int startingLeftIndex = Console.CursorLeft;
+            int startingTopIndex = Console.CursorTop;
+
+            int viewSize = 5;
+
+            List<BaseTile> tiles = new List<BaseTile>();
+
+            Point center = Program.RobotInstance.CurrentPosition.Location;
+
+            Point start = new Point(center.X - (viewSize / 2), center.Y + (viewSize / 2));
+
+            for (int y = 0; y < viewSize; y++)
+            {
+                for (int x = 0; x < viewSize; x++)
+                {
+                    Point current = new Point(start.X + x, start.Y - y);
+                    BaseTile tile = Program.Grid.GetTileAtLocation(current);
+
+                    Console.SetCursorPosition(startingLeftIndex + x, startingTopIndex + y);
+
+                    Type tileType = tile.GetType();
+
+                    if (x == (viewSize / 2) && (y == viewSize / 2))
+                    {
+                        if (Program.RobotInstance.CurrentPosition.Direction == CardinalDirection.North)
+                        {
+                            Console.Write("┴");
+                        }
+                        else if (Program.RobotInstance.CurrentPosition.Direction == CardinalDirection.East)
+                        {
+                            Console.Write("├");
+                        }
+                        else if (Program.RobotInstance.CurrentPosition.Direction == CardinalDirection.South)
+                        {
+                            Console.Write("┬");
+                        }
+                        else if (Program.RobotInstance.CurrentPosition.Direction == CardinalDirection.West)
+                        {
+                            Console.Write("┤");
+                        }
+                    }
+                    else if (tileType == typeof(RockTile))
+                    {
+                        Console.Write("R");
+                    }
+                    else if (tileType == typeof(SpinnerTile))
+                    {
+                        Console.Write("S");
+                    }
+                    else if (tileType == typeof(HoleTile))
+                    {
+                        Console.Write("H");
+                    }
+                    else
+                    {
+                        Console.Write("░");
+                    }
+                }
+            }
+        }
+
+        private static void RobotController_AcknowledgeCommandReceived(object sender, RobotCommandEventArgs e)
+        {
+            Program.OperatorStatus.LastCommandReceived = e;
         }
 
         private static void RobotController_CommandProcessedUnsuccessfully(object sender, EventArgs e)
@@ -85,32 +303,23 @@ namespace RobotController.CLI
 
         private static void RobotController_CommandProcessedSuccessfully(object sender, RobotCommandEventArgs e)
         {
-            Console.WriteLine("Controller: Processed command [id={0}, data={1}] at {2}", e.Command.Id, e.Command.Data, e.Timestamp.ToShortTimeString());
+            Program.OperatorStatus.LastSuccessfullyProcessedCommand = e;
         }
 
         private static void RobotInstance_PositionChanged(object sender, EventArgs e)
         {
-            Console.WriteLine("Robot: from {0} to {1}", Program.RobotInstance.PreviousPosition, Program.RobotInstance.CurrentPosition);
+            Program.RobotStatus.PreviousPositions.Add(Program.RobotInstance.CurrentPosition);
+            Program.RobotStatus.WasLastMoveSuccessful = true;
         }
 
         private static void RobotInstance_TileEncountered(object sender, TileEventArgs e)
         {
-            Type tileType = e.Tile.GetType();
+            Program.RobotStatus.LastTileEncountered = e;
+        }
 
-            if (tileType == typeof(RockTile))
-            {
-                Console.WriteLine("Unable to move to position because of a rock");
-            }
-            else if (tileType == typeof(SpinnerTile))
-            {
-                SpinnerTile st = (SpinnerTile)e.Tile;
-                Console.WriteLine("Encountered a spinner set to [{0}]", st.SpinAmount);
-            }
-            else if (tileType == typeof(HoleTile))
-            {
-                HoleTile ht = (HoleTile)e.Tile;
-                Console.WriteLine("Encountered a hole connected to {0}", ht.ConnectedLocation);
-            }
+        private static void RobotInstance_UnableToChangePosition(object sender, TileEventArgs e)
+        {
+            Program.RobotStatus.WasLastMoveSuccessful = false;
         }
     }
 }
