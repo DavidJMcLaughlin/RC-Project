@@ -152,7 +152,11 @@ namespace RobotController.CLI
             if (File.Exists(path))
             {
                 string fileText = File.ReadAllText(path);
-                Simple2DGrid grid = JsonConvert.DeserializeObject<Simple2DGrid>(fileText);
+                Simple2DGrid grid = JsonConvert.DeserializeObject<Simple2DGrid>(fileText, new JsonSerializerSettings()
+                {
+                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+                    TypeNameHandling = TypeNameHandling.All
+                });
 
                 Program.Grid = grid;
             }
@@ -160,7 +164,10 @@ namespace RobotController.CLI
 
         private static void SaveGridToFile(string path)
         {
-            string text = JsonConvert.SerializeObject(Program.Grid);
+            string text = JsonConvert.SerializeObject(Program.Grid, new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.All
+            });
             File.WriteAllText(path, text);
         }
 
