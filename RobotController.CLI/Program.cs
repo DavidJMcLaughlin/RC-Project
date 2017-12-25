@@ -326,9 +326,10 @@ namespace RobotController.CLI
 
         private static void RegenerateObstructions()
         {
+            Program.Grid.Obstructions.Clear();
+
             List<BaseTile> obstructions = Program.gGenerator.GenerateObstructions(Program.Grid);
 
-            Program.Grid.Obstructions.Clear();
             Program.Grid.Obstructions.AddRange(obstructions);
 
             Program.OutputRenderer.Draw();
