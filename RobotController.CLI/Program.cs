@@ -96,7 +96,12 @@ namespace RobotController.CLI
 
         private static void SetStateFromKey(ConsoleKeyInfo keyInfo)
         {
-
+            switch (keyInfo.Key)
+            {
+                case ConsoleKey.D1:
+                    Program.RegenerateObstructions();
+                    break;
+            }
         }
 
         private static void ProcessSingleCommand(ConsoleKeyInfo keyInfo)
@@ -118,6 +123,16 @@ namespace RobotController.CLI
 
             Program.RobotController.QueueCommand(command);
             Program.RobotController.RunNextCommand();
+        }
+
+        private static void RegenerateObstructions()
+        {
+            List<BaseTile> obstructions = Program.gGenerator.GenerateObstructions(Program.Grid);
+
+            Program.Grid.Obstructions.Clear();
+            Program.Grid.Obstructions.AddRange(obstructions);
+
+            DrawProgramOutput();
         }
 
         private static void DrawProgramOutput()
@@ -217,6 +232,8 @@ namespace RobotController.CLI
             Console.Write(spacer + "Total tiles: {0}", (Program.Grid.Bounds.Width * Program.Grid.Bounds.Height));
             Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
             Console.Write(spacer + "Total obstructions: {0}", Program.Grid.Obstructions.Count);
+            Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
+            Console.Write(spacer + "[1] to regenerate obstructions");
         }
 
         private static void DrawRobotPreviousPositions()
