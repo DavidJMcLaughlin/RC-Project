@@ -89,6 +89,18 @@ namespace RobotController.Grid.Generator
                     freeLocations.RemoveAt(randomIndex);
                 }
 
+                if (newTile.GetType() == typeof(SpinnerTile))
+                {
+                    SpinnerTile sTile = (SpinnerTile)newTile;
+
+                    int randomeRoationRaw = (this.randomGen.Next(1, 3) * 90);
+                    randomeRoationRaw = (this.randomGen.Next(0, 1) == 1 ? randomeRoationRaw * -1 : randomeRoationRaw); // Randomly turn the roation negative
+
+                    Rotation randomRotation = (Rotation)randomeRoationRaw;
+
+                    sTile.SpinAmount = randomRotation;
+                }
+
                 obstructions.Add(newTile);
             }
 
