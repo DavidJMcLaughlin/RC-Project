@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,6 +50,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RobotController.Command.Processor\RobotController.Command.Processor.csproj">
+      <Project>{8cc46f23-f0e8-4f04-b383-c33016b82720}</Project>
+      <Name>RobotController.Command.Processor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RobotController.Command\RobotController.Command.csproj">
+      <Project>{63b07e48-5bf6-4d5c-ae06-14798f882f40}</Project>
+      <Name>RobotController.Command</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RobotController.Grid.Generator\RobotController.Grid.Generator.csproj">
       <Project>{c5415e37-2179-4b7a-9fb0-e34d1dfba20f}</Project>
       <Name>RobotController.Grid.Generator</Name>
@@ -56,6 +65,10 @@
     <ProjectReference Include="..\RobotController.Grid\RobotController.Grid.csproj">
       <Project>{a0dce09e-a954-4bca-89dc-2ef39ce9ce6f}</Project>
       <Name>RobotController.Grid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RobotController.Operator\RobotController.Operator.csproj">
+      <Project>{e9e72189-1873-4d66-ab53-850e51cc762a}</Project>
+      <Name>RobotController.Operator</Name>
     </ProjectReference>
     <ProjectReference Include="..\RobotController.Robot\RobotController.Robot.csproj">
       <Project>{12c9916c-af5b-4a20-a9f6-d330ac40ab25}</Project>
