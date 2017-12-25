@@ -221,6 +221,8 @@ namespace RobotController.CLI
 
         private static void DrawGridStatus()
         {
+            ConsoleColor startingColor = Console.ForegroundColor;
+
             int startingLeftIndex = Console.CursorLeft;
 
             string spacer = "  ";
@@ -232,8 +234,13 @@ namespace RobotController.CLI
             Console.Write(spacer + "Total tiles: {0}", (Program.Grid.Bounds.Width * Program.Grid.Bounds.Height));
             Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
             Console.Write(spacer + "Total obstructions: {0}", Program.Grid.Obstructions.Count);
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+
             Console.SetCursorPosition(startingLeftIndex, Console.CursorTop + 1);
             Console.Write(spacer + "[1] to regenerate obstructions");
+
+            Console.ForegroundColor = startingColor;
         }
 
         private static void DrawRobotPreviousPositions()
