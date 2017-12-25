@@ -80,7 +80,10 @@ namespace RobotController.Robot
         public virtual void Rotate(Rotation rotation)
         {
             CardinalDirection newDirection = this.RotateCardinalDirection(this.CurrentPosition.Direction, rotation);
-            this.SetPosition(new Position(this.CurrentPosition.Location, newDirection));
+            Position newPosition = new Position(this.CurrentPosition.Location, newDirection);
+
+            this.PreviousPosition = this.CurrentPosition;
+            this.CurrentPosition = newPosition;
         }
 
         /// <summary>
