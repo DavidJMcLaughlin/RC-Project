@@ -12,6 +12,9 @@ namespace RobotController.Grid.Tile
     /// </summary>
     public class HoleTile : BaseTile
     {
+        public HoleTile() : base(Point.Empty, HoleTile.TILE_ID)
+        {
+        }
         public HoleTile(Point location) : base(location, HoleTile.TILE_ID)
         {
         }

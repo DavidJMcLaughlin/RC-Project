@@ -12,6 +12,9 @@ namespace RobotController.Grid.Tile
     /// </summary>
     public class SpinnerTile : BaseTile
     {
+        public SpinnerTile() : base(Point.Empty, SpinnerTile.TILE_ID)
+        {
+        }
         public SpinnerTile(Point location) : base(location, SpinnerTile.TILE_ID)
         {
         }

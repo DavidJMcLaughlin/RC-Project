@@ -9,6 +9,9 @@ namespace RobotController.Grid.Tile
 {
     public class EmptyTile : BaseTile
     {
+        public EmptyTile() : base(Point.Empty, EmptyTile.TILE_ID)
+        {
+        }
         public EmptyTile(Point location) : base(location, EmptyTile.TILE_ID)
         {
         }
