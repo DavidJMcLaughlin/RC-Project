@@ -29,7 +29,7 @@ namespace RobotController.Grid
 
         public override string ToString()
         {
-            return string.Format("{X={0}, Y={1}, D={2}}", this.X, this.Y, this.Direction);
+            return string.Format("[X={0}, Y={1}, D={2}]", this.X, this.Y, this.Direction);
         }
     }
 }
