@@ -35,6 +35,9 @@ namespace RobotController.CLI
                 Program.RobotController.RunNextCommand();
             }
             while (keyInfo.Key != ConsoleKey.Escape);
+
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey(true);
         }
 
         private static Random randGen = new Random();
@@ -54,7 +57,7 @@ namespace RobotController.CLI
 
             Console.WriteLine("New grid created: ");
             Console.WriteLine("  Bounds: {0}", Program.Grid.Bounds);
-            Console.WriteLine("  Obstructions: {0}", Program.Grid.Obstructions.Count);
+            Console.WriteLine("  Obstructions: {0} of {1}", Program.Grid.Obstructions.Count, (Program.Grid.Bounds.Width * Program.Grid.Bounds.Height));
             Console.WriteLine();
         }
 
@@ -67,9 +70,15 @@ namespace RobotController.CLI
 
             Program.RobotInstance = new SimpleRobot(Program.Grid, startingPosition);
             Program.RobotInstance.TileEncountered += RobotInstance_TileEncountered;
+            Program.RobotInstance.PositionChanged += RobotInstance_PositionChanged;
 
             Program.RobotController = new RobotOperator(Program.RobotInstance);
             Program.RobotController.RegisterCommandInterpreter(RobotMoveCommand.COMMAND_ID, new MovementCommandInterpreter());
+        }
+
+        private static void RobotInstance_PositionChanged(object sender, EventArgs e)
+        {
+            Console.WriteLine("Robot: {0}", Program.RobotInstance.CurrentPosition);
         }
 
         private static void RobotInstance_TileEncountered(object sender, TileEventArgs e)
@@ -88,15 +97,8 @@ namespace RobotController.CLI
             else if (tileType == typeof(HoleTile))
             {
                 HoleTile ht = (HoleTile)e.Tile;
-                Console.WriteLine("Encountered a hole connected to [{0}]", ht.ConnectedLocation);
+                Console.WriteLine("Encountered a hole connected to {0}", ht.ConnectedLocation);
             }
-
-            string tileName = e.Tile.GetType().Name;
-            int xLocation = Program.RobotInstance.CurrentPosition.X;
-            int yLocation = Program.RobotInstance.CurrentPosition.Y;
-            CardinalDirection direction = Program.RobotInstance.CurrentPosition.Direction;
-
-            Console.WriteLine("{0} at (X={1}, Y={2}, D={3})", tileName, xLocation, yLocation, direction);
         }
     }
 }
