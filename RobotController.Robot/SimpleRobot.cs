@@ -151,7 +151,18 @@ namespace RobotController.Robot
         public virtual Position AdjustPositionForHole(BaseTile tile, Position currentPosition)
         {
             HoleTile hTile = (HoleTile)tile;
-            return new Position(hTile.ConnectedLocation, currentPosition.Direction);
+            Position newPosition;
+
+            if (currentPosition.Location == hTile.ConnectedLocation)
+            {
+                newPosition = new Position(hTile.StartLocation, currentPosition.Direction);
+            }
+            else
+            {
+                newPosition = new Position(hTile.ConnectedLocation, currentPosition.Direction);
+            }
+
+            return newPosition;
         }
 
         public virtual Position AdjustPositionForSpinner(BaseTile tile, Position currentPosition)
