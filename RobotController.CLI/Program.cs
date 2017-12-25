@@ -74,11 +74,23 @@ namespace RobotController.CLI
 
             Program.RobotController = new RobotOperator(Program.RobotInstance);
             Program.RobotController.RegisterCommandInterpreter(RobotMoveCommand.COMMAND_ID, new MovementCommandInterpreter());
+            Program.RobotController.CommandProcessedSuccessfully += RobotController_CommandProcessedSuccessfully;
+            Program.RobotController.CommandProcessedUnsuccessfully += RobotController_CommandProcessedUnsuccessfully;
+        }
+
+        private static void RobotController_CommandProcessedUnsuccessfully(object sender, EventArgs e)
+        {
+            Console.WriteLine("Controller: Unknown command");
+        }
+
+        private static void RobotController_CommandProcessedSuccessfully(object sender, RobotCommandEventArgs e)
+        {
+            Console.WriteLine("Controller: Processed command [id={0}, data={1}] at {2}", e.Command.Id, e.Command.Data, e.Timestamp.ToShortTimeString());
         }
 
         private static void RobotInstance_PositionChanged(object sender, EventArgs e)
         {
-            Console.WriteLine("Robot: {0}", Program.RobotInstance.CurrentPosition);
+            Console.WriteLine("Robot: from {0} to {1}", Program.RobotInstance.PreviousPosition, Program.RobotInstance.CurrentPosition);
         }
 
         private static void RobotInstance_TileEncountered(object sender, TileEventArgs e)
