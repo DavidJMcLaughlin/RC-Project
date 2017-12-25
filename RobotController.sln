@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotController.Robot.Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotController.Operator", "RobotController.Operator\RobotController.Operator.csproj", "{E9E72189-1873-4D66-AB53-850E51CC762A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotController.Operator.Tests", "RobotController.Operator.Tests\RobotController.Operator.Tests.csproj", "{9F754825-F220-4B8C-BF34-D3EC5E8472E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{E9E72189-1873-4D66-AB53-850E51CC762A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9E72189-1873-4D66-AB53-850E51CC762A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9E72189-1873-4D66-AB53-850E51CC762A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F754825-F220-4B8C-BF34-D3EC5E8472E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F754825-F220-4B8C-BF34-D3EC5E8472E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F754825-F220-4B8C-BF34-D3EC5E8472E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F754825-F220-4B8C-BF34-D3EC5E8472E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
