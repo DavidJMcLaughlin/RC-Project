@@ -136,6 +136,10 @@ namespace RobotController.CLI
                     case "-serialize":
                         Program.Serialize = true;
                         break;
+
+                    case "-multimode":
+                        Program.OperationMode = ModeOfOperation.InteractiveMultipleCommand;
+                        break;
                 }
             }
         }
@@ -273,7 +277,7 @@ namespace RobotController.CLI
             Console.SetCursorPosition((screenDivision * 2), 0);
             Program.DrawGridStatus();
 
-            Console.SetCursorPosition(0, (Console.WindowHeight / 2));
+            Console.SetCursorPosition(0, (Console.WindowHeight / 3));
             Program.DrawRobotPreviousPositions();
 
             Console.SetCursorPosition((Console.WindowWidth / 2) - 2, (Console.WindowHeight / 2));
