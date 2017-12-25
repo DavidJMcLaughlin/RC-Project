@@ -24,7 +24,11 @@ namespace RobotController.Operator
 
         public IControllableRobot Robot { get; private set; }
 
+        public Dictionary<int, ICommandInterpreter> RegisteredCommands { get { return this.CommandProcessor.CommandProcessorMap; } }
+
         public event EventHandler<RobotCommandEventArgs> AcknowledgeCommandReceived;
+        public event EventHandler<RobotCommandEventArgs> CommandProcessedSuccessfully;
+        public event EventHandler CommandProcessedUnsuccessfully;
 
         /// <summary>
         /// Stores a command and waits for RunNextCommand() to process it.
@@ -45,6 +49,12 @@ namespace RobotController.Operator
             {
                 RobotCommand command = this.CommandQueue.Dequeue();
                 this.CommandProcessor.ProcessCommand(command, this.Robot);
+
+                this?.CommandProcessedSuccessfully?.Invoke(this, new RobotCommandEventArgs(command));
+            }
+            else
+            {
+                this?.CommandProcessedUnsuccessfully?.Invoke(this, EventArgs.Empty);
             }
         }
 
