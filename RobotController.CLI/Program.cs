@@ -113,17 +113,17 @@ namespace RobotController.CLI
 
         private static void GenerateGrid()
         {
-            Program.gGenerator = new SimpleGridGenerator(new Size(Program.GRID_WIDTH, Program.GRID_HEIGHT));
-            Program.gGenerator.AvailableObstrctions.Add(new HoleTile(Point.Empty));
-            Program.gGenerator.AvailableObstrctions.Add(new RockTile(Point.Empty));
-            Program.gGenerator.AvailableObstrctions.Add(new SpinnerTile(Point.Empty));
-
-            Program.Grid = gGenerator.Generate();
+            Program.Grid = Program.gGenerator.Generate();
 
             Console.WriteLine("New grid created: ");
             Console.WriteLine("  Bounds: {0}", Program.Grid.Bounds);
             Console.WriteLine("  Obstructions: {0} of {1}", Program.Grid.Obstructions.Count, (Program.Grid.Bounds.Width * Program.Grid.Bounds.Height));
             Console.WriteLine();
+        }
+
+        private static void SetupGridGenerator()
+        {
+            Program.gGenerator = new SimpleGridGenerator(new Size(Program.GRID_WIDTH, Program.GRID_HEIGHT));
         }
 
         private static void SetupController()
@@ -152,6 +152,8 @@ namespace RobotController.CLI
 
         private static void SetupInteractiveMode()
         {
+            Program.SetupGridGenerator();
+
             if (Program.Grid == null)
             {
                 Program.GenerateGrid();
@@ -248,6 +250,8 @@ namespace RobotController.CLI
 
         private static void WaitForInput()
         {
+            Program.OutputRenderer.Draw();
+
             ConsoleKeyInfo keyInfo;
 
             do
