@@ -74,7 +74,10 @@ namespace RobotController.Operator
         /// </summary>
         public void RegisterCommandInterpreter(int id, ICommandInterpreter interpreter)
         {
-            this.CommandProcessor.CommandProcessorMap.Add(id, interpreter);
+            if (this.CommandProcessor.CommandProcessorMap != null && !this.CommandProcessor.CommandProcessorMap.ContainsKey(id))
+            {
+                this.CommandProcessor.CommandProcessorMap.Add(id, interpreter);
+            }
         }
     }
 }
