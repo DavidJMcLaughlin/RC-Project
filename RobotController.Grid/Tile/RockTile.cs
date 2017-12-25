@@ -12,6 +12,9 @@ namespace RobotController.Grid.Tile
     /// </summary>
     public class RockTile : BaseTile
     {
+        public RockTile() : base(Point.Empty, RockTile.TILE_ID)
+        {
+        }
         public RockTile(Point location) : base(location, RockTile.TILE_ID)
         {
         }
