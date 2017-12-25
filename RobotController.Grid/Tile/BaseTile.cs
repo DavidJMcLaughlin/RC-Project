@@ -9,6 +9,9 @@ namespace RobotController.Grid.Tile
 {
     public abstract class BaseTile
     {
+        public BaseTile() : this(Point.Empty, int.MinValue)
+        {
+        }
         public BaseTile(int xStartLocation, int yStartLocation, int id) : this(new Point(xStartLocation, yStartLocation), id)
         {
         }
