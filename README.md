@@ -4,7 +4,7 @@ A C# robot controller for navigating a 2D grid with various obstructions.
 ## Getting started:
 This program is built against .NET 4.7.1 and will require Newtonsoft.Json v10.0.3
 
-#### Branch
+#### Main branch
 To build this project you'll need to use the wip-main branch, it contains the code that is working but not quite release ready. At this time there is no 'release' ready code in the master branch.
 
 #### Running the example program
@@ -83,5 +83,5 @@ Defines some objects for processing RobotComand objects.
 #### RobotController.CLI
 A quick and dirty console application for testing an IControllableRobot on a grid.
 
-## Unit Tests:
+## Unit tests:
 Unit tests are setup with MSTestv2. Projects that end with .Tests are the unit tests
