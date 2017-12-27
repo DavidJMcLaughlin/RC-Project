@@ -82,3 +82,6 @@ Defines some objects for processing RobotComand objects.
 
 #### RobotController.CLI
 A quick and dirty console application for testing an IControllableRobot on a grid.
+
+## Unit Tests:
+Unit tests are setup with MSTestv2. Projects that end with .Tests are the unit tests
